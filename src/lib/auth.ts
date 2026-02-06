@@ -9,6 +9,9 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    autoSignIn: false,
+    minPasswordLength: 5,
+    requireEmailVerification: false,
   },
 
   plugins: [nextCookies()],

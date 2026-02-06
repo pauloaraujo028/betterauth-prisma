@@ -25,36 +25,45 @@ import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { toast } from "sonner";
 
-const formSchema = z.object({
-  email: z.email("Please enter a valid email address."),
-  password: z.string().min(3, "Password must be at least 3 characters."),
-});
+const formSchema = z
+  .object({
+    name: z.string().min(3, "Nome deve conter no mínimo 3 caracteres."),
+    email: z.string().email("Por favor, insira um endereço de email válido."),
+    password: z.string().min(3, "Senha deve conter no mínimo 3 caracteres."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
 
-export function LoginForm() {
+export function RegisterForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      await authClient.signIn.email(
+      await authClient.signUp.email(
         {
+          name: data.name,
           email: data.email,
           password: data.password,
-          callbackURL: "/",
         },
         {
           onSuccess: async () => {
-            toast.success("Login realizado com sucesso!");
+            toast.success("Cadastro realizado com sucesso!");
           },
           onError: async (ctx) => {
             toast.error(
               ctx.error.message ||
-                "Falha ao realizar login. Por favor, verifique suas credenciais e tente novamente.",
+                "Falha ao realizar cadastro. Por favor, verifique suas credenciais e tente novamente.",
             );
           },
         },
@@ -69,29 +78,46 @@ export function LoginForm() {
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader className="flex flex-col items-center justify-center">
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription className="text-center">
-          Acesse sua conta para aproveitar todos os recursos disponíveis.
+        <CardTitle className="text-2xl">Cadastro</CardTitle>
+        <CardDescription>
+          Por favor, insira seus dados para criar uma conta.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form
-          id="signin-form"
+          id="signup-form"
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-6"
         >
           <FieldGroup>
             <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Nome</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Digite seu nome"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-email">E-mail</FieldLabel>
+                  <FieldLabel>E-mail</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-demo-email"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Digite seu e-mail"
+                    placeholder="Digite seu email"
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -121,6 +147,25 @@ export function LoginForm() {
                 </Field>
               )}
             />
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Confirmar Senha</FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Digite sua senha novamente"
+                    autoComplete="off"
+                    type="password"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
           </FieldGroup>
         </form>
       </CardContent>
@@ -130,23 +175,19 @@ export function LoginForm() {
           className="flex flex-col items-end justify-end gap-6"
         >
           <p className="text-sm flex items-center">
-            Não possui uma conta?{" "}
+            Já possui uma conta?{" "}
             <Link
-              href="/auth/register"
+              href="/auth/login"
               className="ml-1 hover:underline cursor-pointer"
             >
-              Cadastre-se
+              Faça login
             </Link>
           </p>
-          <Button
-            type="submit"
-            form="signin-form"
-            className="w-full cursor-pointer"
-          >
+          <Button type="submit" form="signup-form" className="w-full">
             {form.formState.isSubmitting ? (
               <Spinner className="size-6" />
             ) : (
-              "Login"
+              "Cadastrar"
             )}
           </Button>
         </Field>

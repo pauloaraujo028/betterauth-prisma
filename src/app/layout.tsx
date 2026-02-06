@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,8 +29,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       suppressHydrationWarning
     >
-      <body className="w-full min-h-dvh bg-linear-to-r from-blue-500 to-purple-500">
+      <body cz-shortcut-listen="true">
         {children}
+        <Toaster />
       </body>
     </html>
   );
