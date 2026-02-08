@@ -57,7 +57,7 @@ const LoginForm = () => {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">
+        <h1 className="mb-2 text-3xl font-bold text-slate-900">
           Bem-vindo de volta!
         </h1>
         <p className="text-slate-500">
@@ -81,22 +81,22 @@ const LoginForm = () => {
             id="email"
             type="email"
             placeholder="exemplo@email.com"
-            className={`w-full px-4 py-2.5 rounded-xl border transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+            className={`w-full rounded-xl border px-4 py-2.5 transition-all placeholder:text-slate-400 focus:ring-2 focus:outline-none ${
               form.formState.errors.email
-                ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20"
             }`}
             {...form.register("email")}
           />
           {form.formState.errors.email && (
-            <span className="text-red-500 text-xs">
+            <span className="text-xs text-red-500">
               {form.formState.errors.email.message}
             </span>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <label
               className="text-sm font-semibold text-slate-700"
               htmlFor="password"
@@ -105,82 +105,49 @@ const LoginForm = () => {
             </label>
             <Link
               href="#"
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+              className="text-xs font-semibold text-indigo-600 transition-colors hover:text-indigo-700"
             >
               Esqueceu a senha?
             </Link>
           </div>
-          <div className="relative group">
+          <div className="group relative">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
-              className={`w-full px-4 py-2.5 rounded-xl border transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+              className={`w-full rounded-xl border px-4 py-2.5 transition-all placeholder:text-slate-400 focus:ring-2 focus:outline-none ${
                 form.formState.errors.password
-                  ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                  : "border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                  : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20"
               }`}
               {...form.register("password")}
             />
-            {form.formState.errors.password && (
-              <span className="text-red-500 text-xs">
-                {form.formState.errors.password.message}
-              </span>
-            )}
+
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none cursor-pointer"
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer p-1.5 text-slate-400 transition-colors hover:text-slate-600 focus:outline-none"
               aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
             >
-              {showPassword ? (
-                <Eye />
-              ) : (
-                // <svg
-                //   xmlns="http://www.w3.org/2000/svg"
-                //   width="20"
-                //   height="20"
-                //   viewBox="0 0 24 24"
-                //   fill="none"
-                //   stroke="currentColor"
-                //   strokeWidth="2"
-                //   strokeLinecap="round"
-                //   strokeLinejoin="round"
-                // >
-                //   <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                //   <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                //   <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-                //   <line x1="2" y1="2" x2="22" y2="22" />
-                // </svg>
-                <EyeOff />
-                // <svg
-                //   xmlns="http://www.w3.org/2000/svg"
-                //   width="20"
-                //   height="20"
-                //   viewBox="0 0 24 24"
-                //   fill="none"
-                //   stroke="currentColor"
-                //   strokeWidth="2"
-                //   strokeLinecap="round"
-                //   strokeLinejoin="round"
-                // >
-                //   <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                //   <circle cx="12" cy="12" r="3" />
-                // </svg>
-              )}
+              {showPassword ? <Eye /> : <EyeOff />}
             </button>
           </div>
+          {form.formState.errors.password && (
+            <span className="text-xs text-red-500">
+              {form.formState.errors.password.message}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
             id="remember"
-            className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           />
           <label
             htmlFor="remember"
-            className="text-xs text-slate-600 font-medium cursor-pointer"
+            className="cursor-pointer text-xs font-medium text-slate-600"
           >
             Lembrar de mim
           </label>
@@ -189,7 +156,7 @@ const LoginForm = () => {
         <button
           type="submit"
           form="signin-form"
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center cursor-pointer"
+          className="flex w-full transform cursor-pointer items-center justify-center rounded-xl bg-indigo-600 py-3 font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:bg-indigo-700 active:scale-[0.98]"
         >
           {form.formState.isSubmitting ? (
             <Spinner className="size-6" />
@@ -201,7 +168,7 @@ const LoginForm = () => {
 
       <div className="relative flex items-center py-2">
         <div className="grow border-t border-slate-200"></div>
-        <span className="shrink mx-4 text-xs font-semibold text-slate-400 uppercase tracking-widest">
+        <span className="mx-4 shrink text-xs font-semibold tracking-widest text-slate-400 uppercase">
           Ou continue com
         </span>
         <div className="grow border-t border-slate-200"></div>
@@ -213,7 +180,7 @@ const LoginForm = () => {
         Não tem uma conta?
         <Link
           href="/auth/register"
-          className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors underline-offset-4 hover:underline ml-1"
+          className="ml-1 font-bold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline"
         >
           Criar conta gratuita
         </Link>

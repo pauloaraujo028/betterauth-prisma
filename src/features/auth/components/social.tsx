@@ -1,25 +1,25 @@
 import { authClient } from "@/lib/auth-client";
-import React from "react";
+import { toast } from "sonner";
 
-const SocialLogin: React.FC = () => {
-  const signInWithGoogle = async () => {
-    await authClient.signIn.social({
-      provider: "google",
+const SocialLogin = () => {
+  const handleSocialSignIn = async (provider: "google" | "github") => {
+    const { error } = await authClient.signIn.social({
+      provider,
       callbackURL: "/",
     });
-  };
-  const signInWithGitHub = async () => {
-    await authClient.signIn.social({
-      provider: "github",
-      callbackURL: "/",
-    });
+
+    if (error) {
+      toast.error(
+        error.message || "Falha ao realizar login. Por favor, tente novamente.",
+      );
+    }
   };
 
   return (
     <div className="space-y-3">
       <button
         className="w-full flex items-center justify-center px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
-        onClick={signInWithGoogle}
+        onClick={() => handleSocialSignIn("google")}
       >
         <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
           <path
@@ -46,7 +46,7 @@ const SocialLogin: React.FC = () => {
 
       <button
         className="w-full flex items-center justify-center px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
-        onClick={signInWithGitHub}
+        onClick={() => handleSocialSignIn("github")}
       >
         <svg
           className="w-5 h-5 mr-3 text-slate-900"
