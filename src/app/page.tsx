@@ -1,7 +1,13 @@
 import Header from "@/features/home/components/header";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+   const session = await auth.api.getSession({
+        headers: await headers()
+    })
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Header />
@@ -17,12 +23,19 @@ export default function Home() {
             empresa com segurança e velocidade.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button className="w-full transform cursor-pointer rounded-2xl bg-indigo-600 px-8 py-4 font-bold text-white shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 hover:bg-indigo-700 sm:w-auto">
+            {session ? (
+              <button className="w-full transform cursor-pointer rounded-2xl bg-indigo-600 px-8 py-4 font-bold text-white shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 hover:bg-indigo-700 sm:w-auto">
+              <Link href="/dashboard">Ir para Dashboard</Link>
+            </button>
+            ) : (
+              <>
+              <button className="w-full transform cursor-pointer rounded-2xl bg-indigo-600 px-8 py-4 font-bold text-white shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 hover:bg-indigo-700 sm:w-auto">
               <Link href="/auth/register">Testar Grátis</Link>
             </button>
             <button className="w-full cursor-pointer rounded-2xl border border-slate-200 bg-white px-8 py-4 font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 sm:w-auto">
               <Link href="#">Ver Demo</Link>
-            </button>
+            </button></>
+            )}
           </div>
         </div>
       </section>

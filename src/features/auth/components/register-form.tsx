@@ -250,7 +250,7 @@ const RegisterForm = () => {
       <p className="text-center text-sm text-slate-600">
         Já possui uma conta?
         <Link
-          href="/auth/register"
+          href="/auth/login"
           className="ml-1 font-bold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline"
         >
           Fazer login
