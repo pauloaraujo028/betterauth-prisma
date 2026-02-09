@@ -1,10 +1,16 @@
 "use client";
 
+import UserAvatar from "@/components/user-avatar";
+import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const session = useSession();
+
+  const user = session?.data?.user;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,19 +53,25 @@ const Header = () => {
         </nav>
 
         {/* Auth Actions */}
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/auth/login"
-            className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors px-4 py-2"
-          >
-            Entrar
-          </Link>
-          <Link
-            href="/auth/register"
-            className="hidden sm:block text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
-          >
-            Começar Agora
-          </Link>
+        <div className="flex items-center space-x-2">
+          {user ? (
+            <UserAvatar />
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors px-4 py-2"
+              >
+                Entrar
+              </Link>
+              <Link
+                href="/auth/register"
+                className="hidden sm:block text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
+              >
+                Começar Agora
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
