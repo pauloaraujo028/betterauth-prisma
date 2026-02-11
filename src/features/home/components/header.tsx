@@ -1,5 +1,7 @@
 "use client";
 
+import { Logo } from "@/components/logo";
+import { routes } from "@/components/navigation";
 import UserAvatar from "@/components/user-avatar";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
@@ -7,6 +9,7 @@ import { useEffect, useState } from "react";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const session = useSession();
 
@@ -20,61 +23,138 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close menu when resizing to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) setIsMobileMenuOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
-        isScrolled
-          ? "py-3 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200"
-          : "py-6 bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center space-x-2 cursor-pointer group">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
-            <div className="w-4 h-4 bg-white rounded-sm transform rotate-45" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">
-            Empresa
-          </span>
-        </div>
+    <>
+      <header
+        className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ease-in-out ${
+          isScrolled
+            ? "border-b border-slate-200 bg-white/80 py-3 shadow-sm backdrop-blur-md"
+            : "bg-transparent py-6"
+        }`}
+      >
+        <div className="container mx-auto flex items-center justify-between px-6">
+          <Logo />
 
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {["Produtos", "Soluções", "Preços", "Recursos"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-
-        {/* Auth Actions */}
-        <div className="flex items-center space-x-2">
-          {user ? (
-            <UserAvatar />
-          ) : (
-            <>
+          {/* Desktop Menu */}
+          <nav className="hidden items-center space-x-8 md:flex">
+            {["Produtos", "Soluções", "Preços", "Recursos"].map((item) => (
               <Link
-                href="/auth/login"
-                className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors px-4 py-2"
+                key={item}
+                href="#"
+                className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600"
+              >
+                {item}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Auth Actions */}
+          <div className="flex items-center space-x-2">
+            {user ? (
+              <UserAvatar />
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:text-indigo-600"
+                >
+                  Entrar
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="hidden transform rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:bg-indigo-700 active:scale-95 sm:block"
+                >
+                  Começar Agora
+                </Link>
+              </>
+            )}
+
+            {/* Hamburger Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-slate-600 transition-colors hover:text-indigo-600 focus:outline-none lg:hidden"
+            >
+              <div className="relative flex h-5 w-6 flex-col justify-between overflow-hidden">
+                <span
+                  className={`h-0.5 w-full origin-left bg-current transition-all duration-300 ${isMobileMenuOpen ? "translate-x-1 rotate-45" : ""}`}
+                ></span>
+                <span
+                  className={`h-0.5 w-full bg-current transition-all duration-300 ${isMobileMenuOpen ? "translate-x-full opacity-0" : ""}`}
+                ></span>
+                <span
+                  className={`h-0.5 w-full origin-left bg-current transition-all duration-300 ${isMobileMenuOpen ? "translate-x-1 -rotate-45" : ""}`}
+                ></span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-white transition-all duration-500 ease-in-out lg:hidden ${
+          isMobileMenuOpen
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-full opacity-0"
+        }`}
+      >
+        <div className="flex h-full flex-col px-6 pt-28 pb-10">
+          <nav className="mb-auto flex flex-col space-y-6">
+            {routes.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="border-b border-slate-50 pb-4 text-2xl font-black text-slate-900 transition-all hover:text-indigo-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          {!user && (
+            <div className="mt-8 space-y-4">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full rounded-2xl border-2 border-slate-100 py-4 text-lg font-bold text-slate-900"
               >
                 Entrar
-              </Link>
-              <Link
-                href="/auth/register"
-                className="hidden sm:block text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
+              </button>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-xl shadow-indigo-100"
               >
-                Começar Agora
-              </Link>
-            </>
+                Começar agora
+              </button>
+            </div>
+          )}
+
+          {user && (
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+              }}
+              className="mt-8 w-full rounded-2xl bg-red-50 py-4 text-lg font-bold text-red-500"
+            >
+              Sair da conta
+            </button>
           )}
         </div>
       </div>
-    </header>
+    </>
   );
 };
 

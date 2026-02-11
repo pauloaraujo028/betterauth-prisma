@@ -8,7 +8,7 @@ import {
   GoHomeFill,
 } from "react-icons/go";
 
-const routes = [
+export const routes = [
   {
     label: "Home",
     href: "/",
