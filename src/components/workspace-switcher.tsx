@@ -29,7 +29,9 @@ const WorkspaceSwitcher = () => {
 
       <div>
         <select className="w-full bg-neutral-200 p-1 font-medium">
-          <option value="default">Nenhum workspace selecionado</option>
+          <option value="default" disabled selected>
+            Nenhum workspace selecionado
+          </option>
           {workspaces.map((item) => (
             <option key={item.name} value={item.name}>
               {item.name}
