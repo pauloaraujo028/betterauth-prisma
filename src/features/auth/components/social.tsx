@@ -5,7 +5,7 @@ const SocialLogin = () => {
   const handleSocialSignIn = async (provider: "google" | "github") => {
     const { error } = await authClient.signIn.social({
       provider,
-      callbackURL: "/",
+      callbackURL: "/dashboard",
     });
 
     if (error) {
@@ -18,10 +18,10 @@ const SocialLogin = () => {
   return (
     <div className="space-y-3">
       <button
-        className="w-full flex items-center justify-center px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+        className="group flex w-full cursor-pointer items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 transition-colors hover:bg-slate-50"
         onClick={() => handleSocialSignIn("google")}
       >
-        <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+        <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
           <path
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
             fill="#4285F4"
@@ -45,11 +45,11 @@ const SocialLogin = () => {
       </button>
 
       <button
-        className="w-full flex items-center justify-center px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+        className="group flex w-full cursor-pointer items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 transition-colors hover:bg-slate-50"
         onClick={() => handleSocialSignIn("github")}
       >
         <svg
-          className="w-5 h-5 mr-3 text-slate-900"
+          className="mr-3 h-5 w-5 text-slate-900"
           fill="currentColor"
           viewBox="0 0 24 24"
         >

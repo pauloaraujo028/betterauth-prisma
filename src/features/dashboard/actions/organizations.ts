@@ -1,30 +1,42 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/prisma";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { getCurrentUser } from "./users";
 
 export async function getOrganizations() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
+  const { currentUser } = await getCurrentUser();
+
+  const members = await db.member.findMany({
+    where: {
+      userId: currentUser.id,
+    },
   });
-
-  if (!session) {
-    redirect("/auth/login");
-  }
-
-  const currentUser = await db.member.findFirst({
-    where: {},
-  });
-
-  if (!currentUser) {
-    redirect("/auth/login");
-  }
 
   const organizations = await db.organization.findMany({
-    where: {},
+    where: {
+      id: {
+        in: members.map((member) => member.organizationId),
+      },
+    },
   });
 
   return organizations;
+}
+
+export async function getActiveOrganization(userId: string) {
+  const memberUser = await db.member.findFirst({
+    where: {
+      userId,
+    },
+  });
+
+  if (!memberUser) return null;
+
+  const activeOrganization = await db.organization.findFirst({
+    where: {
+      id: memberUser.organizationId,
+    },
+  });
+
+  return activeOrganization;
 }

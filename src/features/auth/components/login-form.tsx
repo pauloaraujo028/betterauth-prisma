@@ -1,57 +1,66 @@
 "use client";
 
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { Login } from "../actions/login";
+import { loginSchema } from "../schemas/login";
 import SocialLogin from "./social";
-
-const formSchema = z.object({
-  email: z.email("Por favor, insira um endereço de email válido."),
-  password: z.string().min(5, "Senha deve conter no mínimo 5 caracteres."),
-});
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      await authClient.signIn.email(
-        {
-          email: data.email,
-          password: data.password,
-          callbackURL: "/",
-        },
-        {
-          onSuccess: async () => {
-            toast.success("Login realizado com sucesso!");
-          },
-          onError: async (ctx) => {
-            toast.error(
-              ctx.error.message ||
-                "Falha ao realizar login. Por favor, verifique suas credenciais e tente novamente.",
-            );
-          },
-        },
-      );
-    } catch {
-      throw new Error(
-        "Ops! Ocoreu um erro inesperado. Por favor, tente novamente.",
-      );
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+    // try {
+    //   await authClient.signIn.email(
+    //     {
+    //       email: data.email,
+    //       password: data.password,
+    //       callbackURL: "/",
+    //     },
+    //     {
+    //       onSuccess: async () => {
+    //         toast.success("Login realizado com sucesso!");
+    //       },
+    //       onError: async (ctx) => {
+    //         toast.error(
+    //           ctx.error.message ||
+    //             "Falha ao realizar login. Por favor, verifique suas credenciais e tente novamente.",
+    //         );
+    //       },
+    //     },
+    //   );
+    // } catch {
+    //   throw new Error(
+    //     "Ops! Ocoreu um erro inesperado. Por favor, tente novamente.",
+    //   );
+    // }
+
+    const response = await Login(data);
+
+    if (response.error) {
+      toast.error(response.error);
+      return;
     }
+
+    toast.success("Login realizado com sucesso!");
+    router.push("/dashboard");
   };
 
   return (
