@@ -1,7 +1,6 @@
 "use client";
 
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
@@ -10,19 +9,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { Register } from "../actions/register";
+import { registerSchema } from "../schemas/register";
 import SocialLogin from "./social";
-
-const formSchema = z
-  .object({
-    name: z.string().min(3, "Nome deve conter no mínimo 3 caracteres."),
-    email: z.string().email("Por favor, insira um endereço de email válido."),
-    password: z.string().min(3, "Senha deve conter no mínimo 3 caracteres."),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "As senhas não coincidem.",
-    path: ["confirmPassword"],
-  });
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,8 +19,8 @@ const RegisterForm = () => {
 
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -40,32 +29,45 @@ const RegisterForm = () => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      await authClient.signUp.email(
-        { name: data.name, email: data.email, password: data.password },
-        {
-          onSuccess: async () => {
-            toast.success("Cadastro realizado com sucesso!");
-            form.reset();
-            setTimeout(() => {
-              toast.info("Redirecionando para a página de login...");
-              router.push("/auth/login");
-            }, 3000);
-          },
-          onError: async (ctx) => {
-            toast.error(
-              ctx.error.message ||
-                "Falha ao realizar cadastro. Por favor, verifique suas credenciais e tente novamente.",
-            );
-          },
-        },
-      );
-    } catch {
-      throw new Error(
-        "Ops! Ocoreu um erro inesperado. Por favor, tente novamente.",
-      );
+  const onSubmit = async (data: z.infer<typeof registerSchema>) => {
+    // try {
+    //   await authClient.signUp.email(
+    //     { name: data.name, email: data.email, password: data.password },
+    //     {
+    //       onSuccess: async () => {
+    //         toast.success("Cadastro realizado com sucesso!");
+    //         form.reset();
+    //         setTimeout(() => {
+    //           toast.info("Redirecionando para a página de login...");
+    //           router.push("/auth/login");
+    //         }, 3000);
+    //       },
+    //       onError: async (ctx) => {
+    //         toast.error(
+    //           ctx.error.message ||
+    //             "Falha ao realizar cadastro. Por favor, verifique suas credenciais e tente novamente.",
+    //         );
+    //       },
+    //     },
+    //   );
+    // } catch {
+    //   throw new Error(
+    //     "Ops! Ocoreu um erro inesperado. Por favor, tente novamente.",
+    //   );
+    // }
+    const response = await Register(data);
+
+    if (response.error) {
+      toast.error(response.error);
+      return;
     }
+
+    toast.success("Cadastro realizado com sucesso!");
+    form.reset();
+    setTimeout(() => {
+      toast.info("Redirecionando para a página de login...");
+      router.push("/auth/login");
+    }, 3000);
   };
 
   return (
