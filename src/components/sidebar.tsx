@@ -1,7 +1,7 @@
 import DottedSeparator from "@/components/dotted-separator";
 import { Logo } from "@/components/logo";
 import Navigation from "@/components/navigation";
-import WorkspaceSwitcher from "@/components/workspace-switcher";
+import WorkspaceSwitcher from "@/features/workspaces/components/workspace-switcher";
 
 const Sidebar = () => {
   return (
