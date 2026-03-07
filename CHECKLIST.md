@@ -30,31 +30,87 @@ avançado.
   - [ ] criar na raiz do projeto `.prettierrc.json ou .prettierrc`
   - [ ] `{ "plugins": ["prettier-plugin-tailwindcss"] }`
 
-## 🧩 PARTE 1 --- Setup da Autenticação
+---
+
+## 🧩 PARTE 1 --- Setup Prisma
+
+- [ ] instalar prisma `pnpm add prisma tsx @types/pg --save-dev`
+- [ ] instalar pacotes `pnpm add @prisma/client @prisma/adapter-pg pg dotenv`
+- [ ] inicializar o prisma `pnpm dlx prisma init`
+- [ ] mudar o output do schema.prisma `prisma/schema.prisma`
+  - [ ] `output   = "../src/lib/generated/prisma"`
+- [ ] o arquivo `.env` na raiz do projeto vai mostrar o `DATABASE_URL`
+- [ ] acessar `https://neon.com/`
+  - [ ] logar com a conta
+  - [ ] new project
+  - [ ] project name
+  - [ ] escolher região (opcional)
+  - [ ] create
+  - [ ] dentro do projeto entrar em `Connect`
+  - [ ] desmarcar `Connection pooling`
+  - [ ] copiar a `Connetion string` para o arquivo `.env` e colar em `DATABASE_URL`
+- [ ] gerar o Prisma Client `pnpm dlx prisma generate`
+- [ ] criar arquivo `prisma.ts` dentro da pasta `lib`
+
+  ```
+  import { PrismaClient } from "@/lib/generated/prisma/client"
+  import { PrismaPg } from "@prisma/adapter-pg";
+
+  const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+  });
+
+  export const db = globalForPrisma.prisma || new PrismaClient({ adapter });
+
+  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+  ```
+
+- [ ] adicionar `/src/lib/generated/prisma` no arquivo `.gitignore`
+- [ ] ajustar **scripts build** no `package.json` para vercel `"build": "prisma generate && next build",`
+
+---
+
+## 🧩 PARTE 2 --- Setup da Autenticação
 
 - [ ] instalar Better Auth `npm install better-auth`
-- [ ] criar `.env` e definir variáveis de ambiente
-- [ ] criar `lib/auth.ts`
-- [ ] configurar banco de dados`postgres` com `neon.tech`
-- [ ] instalar prisma `npm install prisma --save-dev`
-- [ ] inicializar prisma `npx prisma init`
-- [ ] criar **Post** model
-- [ ] enviar alterações para o banco de dados `npx prisma db push`
-- [ ] adicionar `generated` para `.gitignore`
-- [ ] ajustar **scripts** no `package.json`
+- [ ] editar o arquivo `.env` e configurar variáveis de ambiente
+  - [ ] (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_URL`)
+  - [ ] gerar a secret `pnpm dlx @better-auth/cli@latest secret`
+  - [ ] ou copiar da doc do Better Auth `https://better-auth.com/docs/installation` passo 2
+- [ ] criar `auth.ts` dentro da pasta `lib`
 
-- create single Prisma Client in `lib/prisma.ts`
-- setup prisma adapter with better-auth
-- generate auth tables `npx @better-auth/cli generate --output=auth.schema.prisma`
-- make tweaks to `schema.prisma`
-- quick walkthrough the models:
-  - `User`
-  - `Session`
-  - `Account`
-  - `Verification`
-- push database changes `npx prisma db push`
-- create Mount Handler in `app/api/auth/[...all]/route.ts`
-- adjust `eslint.config.mjs` to ignore `/src/generated/**/*`
+```
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { db } from "./prisma";
+
+export const auth = betterAuth({
+  database: prismaAdapter(db, {
+    provider: "postgresql",
+  }),
+});
+```
+
+- [ ] gerar os models do better auth no prisma `pnpm dlx @better-auth/cli generate`
+- [ ] vai criar os models no `schema.prisma`:
+  - `User` renomear o @@map para users
+  - `Session` renomear o @@map para sessions
+  - `Account` renomear o @@map para accounts
+  - `Verification` renomear o @@map para verifications
+- [ ] criar migration `pnpm dlx prisma migrate dev --name add-auth-models`
+- [ ] gerar o Prisma Client `pnpm dlx prisma generate`
+- [ ] criar Mount Handler em `app/api/auth/[...all]/route.ts`
+
+```
+import { auth } from "@/lib/auth";
+import { toNextJsHandler } from "better-auth/next-js";
+
+export const { POST, GET } = toNextJsHandler(auth);
+```
+
+- [ ]ajustar `eslint.config.mjs` para ignorar `/src/generated/**/*`
 - create Client instance in `lib/auth-client.ts`
 
 - Enable Email & Password Authentication
@@ -222,3 +278,7 @@ avançado.
 - FINISH PART 7
 
 THANK YOU FOR WATCHING
+
+```
+
+```
